@@ -1,0 +1,163 @@
+.home {
+  padding-top: 64px;
+  flex: 1;
+}
+
+/* Hero / Buscador */
+.home-hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  padding: 4rem 0 3rem;
+  color: white;
+  text-align: center;
+}
+
+.home-hero-title {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.home-hero-sub {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 2rem;
+}
+
+.home-search {
+  display: flex;
+  gap: 0.6rem;
+  max-width: 600px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.home-search-input {
+  flex: 1;
+  min-width: 220px;
+  padding: 0.7rem 1.1rem;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.home-search-clear {
+  border-color: rgba(255,255,255,0.5);
+  color: white;
+}
+.home-search-clear:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+/* Body */
+.home-body {
+  padding: 2.5rem 1.5rem;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--accent);
+  display: inline-block;
+}
+
+/* Categorías */
+.home-cats {
+  margin-bottom: 2.5rem;
+}
+
+.home-cats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 30px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cat-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #eaf0f8;
+}
+
+.cat-icon {
+  font-size: 1.1rem;
+}
+
+/* Grilla de productos: 2 columnas, máx 5 filas = 10 productos */
+.home-products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.home-empty {
+  color: var(--text-muted);
+  font-size: 1rem;
+  padding: 2rem 0;
+}
+
+@media (max-width: 600px) {
+  .home-products-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.home-search-dates {
+  display: flex;
+  gap: 0.5rem;
+  background: white;
+  border-radius: var(--radius);
+  padding: 0.3rem 0.75rem;
+  align-items: center;
+}
+
+.home-date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.home-date-field label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.home-date-input {
+  border: none;
+  outline: none;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: var(--text);
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+}
+
+@media (max-width: 700px) {
+  .home-search { flex-direction: column; align-items: stretch; }
+  .home-search-dates { justify-content: space-between; }
+}

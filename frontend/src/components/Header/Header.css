@@ -1,0 +1,138 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--primary);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  height: 64px;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white;
+}
+
+.header-logo {
+  font-size: 1.8rem;
+}
+
+.header-name {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.2;
+}
+
+.header-slogan {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.03em;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-nav .btn-outline {
+  border-color: rgba(255,255,255,0.5);
+  color: white;
+}
+.header-nav .btn-outline:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+@media (max-width: 540px) {
+  .header-slogan { display: none; }
+  .header-nav .btn-outline { display: none; }
+}
+
+.header-user {
+  position: relative;
+}
+
+.header-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.3);
+  transition: border-color 0.2s;
+}
+.header-avatar:hover { border-color: var(--accent); }
+
+.header-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  min-width: 210px;
+  overflow: hidden;
+  z-index: 200;
+}
+
+.header-dropdown-info {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.header-dropdown-info strong {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.header-dropdown-info span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.header-rol-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--primary) !important;
+  font-size: 0.68rem !important;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  width: fit-content;
+  margin-top: 0.2rem;
+}
+
+.header-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.88rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.header-dropdown button:hover { background: var(--bg); }
