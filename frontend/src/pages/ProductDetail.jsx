@@ -75,7 +75,7 @@ export default function ProductDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleReservar = (e) => {
+  const handleReservar = async (e) => {
     e.preventDefault();
     setReservaMsg(''); setReservaError('');
     if (!isLoggedIn()) { navigate(`/reserva/${id}`); };
