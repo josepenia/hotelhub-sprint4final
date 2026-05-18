@@ -23,12 +23,30 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaService.getAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(categoriaService.getById(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody Categoria categoria) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(categoriaService.crear(categoria));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editar(@PathVariable Long id, @RequestBody Categoria categoria) {
+        try {
+            return ResponseEntity.ok(categoriaService.editar(id, categoria));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
     }
 

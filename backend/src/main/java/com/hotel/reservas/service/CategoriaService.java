@@ -17,17 +17,30 @@ public class CategoriaService {
         return categoriaRepository.findAll();
     }
 
+    public Categoria getById(Long id) {
+        return categoriaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + id));
+    }
+
     public Categoria crear(Categoria categoria) {
-        if (categoriaRepository.existsByNombre(categoria.getNombre())) {
+        if (categoriaRepository.existsByNombre(categoria.getNombre()))
             throw new RuntimeException("Ya existe una categoría con ese nombre");
-        }
         return categoriaRepository.save(categoria);
     }
 
+    public Categoria editar(Long id, Categoria categoria) {
+        Categoria existing = categoriaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + id));
+        existing.setNombre(categoria.getNombre());
+        existing.setDescripcion(categoria.getDescripcion());
+        existing.setIcono(categoria.getIcono());
+        existing.setImagenUrl(categoria.getImagenUrl());
+        return categoriaRepository.save(existing);
+    }
+
     public void eliminar(Long id) {
-        if (!categoriaRepository.existsById(id)) {
-            throw new RuntimeException("Categoría no encontrada");
-        }
+        if (!categoriaRepository.existsById(id))
+            throw new RuntimeException("Categoría no encontrada con id: " + id);
         categoriaRepository.deleteById(id);
     }
 }

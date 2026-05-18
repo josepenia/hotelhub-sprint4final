@@ -46,17 +46,33 @@ public class ProductoService {
     }
 
     public ProductoDTO crearProducto(ProductoDTO dto) {
-        if (productoRepository.existsByNombre(dto.getNombre())) {
+        if (productoRepository.existsByNombre(dto.getNombre()))
             throw new RuntimeException("Ya existe un producto con el nombre: " + dto.getNombre());
+        return toDTO(productoRepository.save(toEntity(dto)));
+    }
+
+    public ProductoDTO editarProducto(Long id, ProductoDTO dto) {
+        Producto p = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
+        p.setNombre(dto.getNombre());
+        p.setDescripcion(dto.getDescripcion());
+        p.setImagenes(dto.getImagenes());
+        if (dto.getCategoriaId() != null) {
+            Categoria cat = categoriaRepository.findById(dto.getCategoriaId())
+                    .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+            p.setCategoria(cat);
         }
-        Producto p = toEntity(dto);
+        if (dto.getCaracteristicaIds() != null && !dto.getCaracteristicaIds().isEmpty()) {
+            Set<Caracteristica> caracts = new HashSet<>(
+                    caracteristicaRepository.findAllById(dto.getCaracteristicaIds()));
+            p.setCaracteristicas(caracts);
+        }
         return toDTO(productoRepository.save(p));
     }
 
     public void eliminarProducto(Long id) {
-        if (!productoRepository.existsById(id)) {
+        if (!productoRepository.existsById(id))
             throw new RuntimeException("Producto no encontrado con id: " + id);
-        }
         productoRepository.deleteById(id);
     }
 
