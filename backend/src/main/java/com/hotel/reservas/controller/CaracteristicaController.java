@@ -1,7 +1,7 @@
 package com.hotel.reservas.controller;
 
 import com.hotel.reservas.model.Caracteristica;
-import com.hotel.reservas.repository.CaracteristicaRepository;
+import com.hotel.reservas.service.CaracteristicaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,38 +17,38 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:3000")
 public class CaracteristicaController {
 
-    private final CaracteristicaRepository repo;
+    private final CaracteristicaService caracteristicaService;
 
     @GetMapping
     public ResponseEntity<List<Caracteristica>> getAll() {
-        return ResponseEntity.ok(repo.findAll());
+        return ResponseEntity.ok(caracteristicaService.getAll());
     }
 
     @PostMapping
     public ResponseEntity<?> crear(@Valid @RequestBody Caracteristica c) {
-        if (repo.existsByNombre(c.getNombre())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "Ya existe una característica con ese nombre"));
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(caracteristicaService.crear(c));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(repo.save(c));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> editar(@PathVariable Long id, @Valid @RequestBody Caracteristica c) {
-        return repo.findById(id).map(existing -> {
-            existing.setNombre(c.getNombre());
-            existing.setIcono(c.getIcono());
-            return ResponseEntity.ok(repo.save(existing));
-        }).orElse(ResponseEntity.notFound().build());
+        try {
+            return ResponseEntity.ok(caracteristicaService.editar(id, c));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
-        if (!repo.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "Característica no encontrada"));
+        try {
+            caracteristicaService.eliminar(id);
+            return ResponseEntity.ok(Map.of("mensaje", "Característica eliminada"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
-        repo.deleteById(id);
-        return ResponseEntity.ok(Map.of("mensaje", "Característica eliminada"));
     }
 }
