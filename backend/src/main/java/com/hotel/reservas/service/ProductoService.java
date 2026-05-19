@@ -1,6 +1,8 @@
 package com.hotel.reservas.service;
 
 import com.hotel.reservas.dto.ProductoDTO;
+import com.hotel.reservas.exception.ConflictException;
+import com.hotel.reservas.exception.ResourceNotFoundException;
 import com.hotel.reservas.model.Categoria;
 import com.hotel.reservas.model.Caracteristica;
 import com.hotel.reservas.model.Producto;
@@ -26,53 +28,44 @@ public class ProductoService {
     private final CaracteristicaRepository caracteristicaRepository;
 
     public List<ProductoDTO> getProductosAleatorios() {
-        return productoRepository.findRandomProductos()
-                .stream().map(this::toDTO).collect(Collectors.toList());
+        return productoRepository.findRandomProductos().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     public Page<ProductoDTO> getAllProductos(Pageable pageable) {
         return productoRepository.findAll(pageable).map(this::toDTO);
     }
 
-    public List<ProductoDTO> getByCategoria(Long categoriaId) {
-        return productoRepository.findByCategoriaId(categoriaId)
-                .stream().map(this::toDTO).collect(Collectors.toList());
-    }
-
     public ProductoDTO getProductoById(Long id) {
-        Producto p = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
-        return toDTO(p);
+        return toDTO(productoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id)));
     }
 
     public ProductoDTO crearProducto(ProductoDTO dto) {
         if (productoRepository.existsByNombre(dto.getNombre()))
-            throw new RuntimeException("Ya existe un producto con el nombre: " + dto.getNombre());
+            throw new ConflictException("Ya existe un producto con el nombre: " + dto.getNombre());
         return toDTO(productoRepository.save(toEntity(dto)));
     }
 
     public ProductoDTO editarProducto(Long id, ProductoDTO dto) {
         Producto p = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
         p.setNombre(dto.getNombre());
         p.setDescripcion(dto.getDescripcion());
         p.setImagenes(dto.getImagenes());
         if (dto.getCategoriaId() != null) {
             Categoria cat = categoriaRepository.findById(dto.getCategoriaId())
-                    .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada"));
             p.setCategoria(cat);
         }
         if (dto.getCaracteristicaIds() != null && !dto.getCaracteristicaIds().isEmpty()) {
-            Set<Caracteristica> caracts = new HashSet<>(
-                    caracteristicaRepository.findAllById(dto.getCaracteristicaIds()));
-            p.setCaracteristicas(caracts);
+            p.setCaracteristicas(new HashSet<>(caracteristicaRepository.findAllById(dto.getCaracteristicaIds())));
         }
         return toDTO(productoRepository.save(p));
     }
 
     public void eliminarProducto(Long id) {
         if (!productoRepository.existsById(id))
-            throw new RuntimeException("Producto no encontrado con id: " + id);
+            throw new ResourceNotFoundException("Producto no encontrado con id: " + id);
         productoRepository.deleteById(id);
     }
 
@@ -105,12 +98,11 @@ public class ProductoService {
         p.setImagenes(dto.getImagenes());
         if (dto.getCategoriaId() != null) {
             Categoria cat = categoriaRepository.findById(dto.getCategoriaId())
-                    .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada"));
             p.setCategoria(cat);
         }
         if (dto.getCaracteristicaIds() != null && !dto.getCaracteristicaIds().isEmpty()) {
-            Set<Caracteristica> caracts = new HashSet<>(
-                    caracteristicaRepository.findAllById(dto.getCaracteristicaIds()));
+            Set<Caracteristica> caracts = new HashSet<>(caracteristicaRepository.findAllById(dto.getCaracteristicaIds()));
             p.setCaracteristicas(caracts);
         }
         return p;

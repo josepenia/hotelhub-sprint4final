@@ -1,5 +1,7 @@
 package com.hotel.reservas.service;
 
+import com.hotel.reservas.exception.ConflictException;
+import com.hotel.reservas.exception.ResourceNotFoundException;
 import com.hotel.reservas.model.Categoria;
 import com.hotel.reservas.repository.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,18 +21,18 @@ public class CategoriaService {
 
     public Categoria getById(Long id) {
         return categoriaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada con id: " + id));
     }
 
     public Categoria crear(Categoria categoria) {
         if (categoriaRepository.existsByNombre(categoria.getNombre()))
-            throw new RuntimeException("Ya existe una categoría con ese nombre");
+            throw new ConflictException("Ya existe una categoría con ese nombre");
         return categoriaRepository.save(categoria);
     }
 
     public Categoria editar(Long id, Categoria categoria) {
         Categoria existing = categoriaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada con id: " + id));
         existing.setNombre(categoria.getNombre());
         existing.setDescripcion(categoria.getDescripcion());
         existing.setIcono(categoria.getIcono());
@@ -40,7 +42,7 @@ public class CategoriaService {
 
     public void eliminar(Long id) {
         if (!categoriaRepository.existsById(id))
-            throw new RuntimeException("Categoría no encontrada con id: " + id);
+            throw new ResourceNotFoundException("Categoría no encontrada con id: " + id);
         categoriaRepository.deleteById(id);
     }
 }

@@ -1,5 +1,6 @@
 package com.hotel.reservas.service;
 
+import com.hotel.reservas.exception.ResourceNotFoundException;
 import com.hotel.reservas.model.Favorito;
 import com.hotel.reservas.model.Producto;
 import com.hotel.reservas.model.Usuario;
@@ -42,7 +43,7 @@ public class FavoritoService {
             return Map.of("favorito", false);
         } else {
             Producto producto = productoRepository.findById(productoId)
-                    .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + productoId));
+                    .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + productoId));
             favoritoRepository.save(new Favorito(null, usuario, producto));
             return Map.of("favorito", true);
         }

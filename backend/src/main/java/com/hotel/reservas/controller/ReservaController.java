@@ -1,13 +1,15 @@
 package com.hotel.reservas.controller;
 
+import com.hotel.reservas.dto.ReservaDTO;
+import com.hotel.reservas.exception.UnauthorizedException;
 import com.hotel.reservas.model.Usuario;
 import com.hotel.reservas.service.ReservaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -25,23 +27,15 @@ public class ReservaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crear(@AuthenticationPrincipal Usuario usuario,
-                                   @RequestBody Map<String, String> body) {
-        if (usuario == null)
-            return ResponseEntity.status(401).body(Map.of("error", "Debe iniciar sesión para reservar"));
-        try {
-            Long productoId = Long.parseLong(body.get("productoId"));
-            LocalDate inicio = LocalDate.parse(body.get("fechaInicio"));
-            LocalDate fin = LocalDate.parse(body.get("fechaFin"));
-            return ResponseEntity.ok(reservaService.crearReserva(usuario, productoId, inicio, fin));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<ReservaDTO.Response> crear(@AuthenticationPrincipal Usuario usuario,
+                                                      @Valid @RequestBody ReservaDTO.Request req) {
+        if (usuario == null) throw new UnauthorizedException("Debe iniciar sesión para reservar");
+        return ResponseEntity.ok(reservaService.crearReserva(usuario, req));
     }
 
     @GetMapping("/mis-reservas")
-    public ResponseEntity<?> misReservas(@AuthenticationPrincipal Usuario usuario) {
-        if (usuario == null) return ResponseEntity.status(401).build();
+    public ResponseEntity<List<ReservaDTO.Response>> misReservas(@AuthenticationPrincipal Usuario usuario) {
+        if (usuario == null) throw new UnauthorizedException("Debe iniciar sesión");
         return ResponseEntity.ok(reservaService.getMisReservas(usuario.getId()));
     }
 }

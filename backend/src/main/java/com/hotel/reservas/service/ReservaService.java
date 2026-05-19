@@ -1,5 +1,9 @@
 package com.hotel.reservas.service;
 
+import com.hotel.reservas.dto.ReservaDTO;
+import com.hotel.reservas.exception.BadRequestException;
+import com.hotel.reservas.exception.ConflictException;
+import com.hotel.reservas.exception.ResourceNotFoundException;
 import com.hotel.reservas.model.Producto;
 import com.hotel.reservas.model.Reserva;
 import com.hotel.reservas.model.Usuario;
@@ -28,48 +32,46 @@ public class ReservaService {
                 )).collect(Collectors.toList());
     }
 
-    public Map<String, Object> crearReserva(Usuario usuario, Long productoId,
-                                             LocalDate inicio, LocalDate fin) {
-        if (!inicio.isBefore(fin))
-            throw new RuntimeException("La fecha de inicio debe ser anterior a la de fin");
+    public ReservaDTO.Response crearReserva(Usuario usuario, ReservaDTO.Request req) {
+        if (!req.getFechaInicio().isBefore(req.getFechaFin()))
+            throw new BadRequestException("La fecha de inicio debe ser anterior a la de fin");
 
-        List<Reserva> conflictos = reservaRepository.findConflictos(productoId, inicio, fin);
+        List<Reserva> conflictos = reservaRepository.findConflictos(req.getProductoId(), req.getFechaInicio(), req.getFechaFin());
         if (!conflictos.isEmpty())
-            throw new RuntimeException("Las fechas seleccionadas no están disponibles");
+            throw new ConflictException("Las fechas seleccionadas no están disponibles");
 
-        Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + productoId));
+        Producto producto = productoRepository.findById(req.getProductoId())
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + req.getProductoId()));
 
-        Reserva reserva = new Reserva(null, producto, usuario, inicio, fin);
+        Reserva reserva = new Reserva(null, producto, usuario, req.getFechaInicio(), req.getFechaFin());
         Reserva guardada = reservaRepository.save(reserva);
 
-        return Map.of(
-                "id", guardada.getId(),
-                "productoId", producto.getId(),
-                "productoNombre", producto.getNombre(),
-                "fechaInicio", inicio.toString(),
-                "fechaFin", fin.toString(),
-                "mensaje", "Reserva realizada correctamente"
-        );
+        ReservaDTO.Response res = new ReservaDTO.Response();
+        res.setId(guardada.getId());
+        res.setProductoId(producto.getId());
+        res.setProductoNombre(producto.getNombre());
+        res.setFechaInicio(req.getFechaInicio());
+        res.setFechaFin(req.getFechaFin());
+        res.setMensaje("Reserva realizada correctamente");
+        return res;
     }
 
-    public List<Map<String, Object>> getMisReservas(Long usuarioId) {
+    public List<ReservaDTO.Response> getMisReservas(Long usuarioId) {
         return reservaRepository.findByUsuarioId(usuarioId)
                 .stream()
                 .sorted((a, b) -> b.getFechaInicio().compareTo(a.getFechaInicio()))
                 .map(r -> {
-                    String imagen = (r.getProducto().getImagenes() != null && !r.getProducto().getImagenes().isEmpty())
-                            ? r.getProducto().getImagenes().get(0) : "";
-                    return Map.<String, Object>of(
-                            "id", r.getId(),
-                            "productoId", r.getProducto().getId(),
-                            "productoNombre", r.getProducto().getNombre(),
-                            "productoImagen", imagen,
-                            "categoriaNombre", r.getProducto().getCategoria() != null ? r.getProducto().getCategoria().getNombre() : "",
-                            "fechaInicio", r.getFechaInicio().toString(),
-                            "fechaFin", r.getFechaFin().toString(),
-                            "estado", r.getFechaFin().isBefore(LocalDate.now()) ? "Finalizada" : "Activa"
-                    );
+                    ReservaDTO.Response res = new ReservaDTO.Response();
+                    res.setId(r.getId());
+                    res.setProductoId(r.getProducto().getId());
+                    res.setProductoNombre(r.getProducto().getNombre());
+                    res.setProductoImagen(r.getProducto().getImagenes() != null && !r.getProducto().getImagenes().isEmpty()
+                            ? r.getProducto().getImagenes().get(0) : "");
+                    res.setCategoriaNombre(r.getProducto().getCategoria() != null ? r.getProducto().getCategoria().getNombre() : "");
+                    res.setFechaInicio(r.getFechaInicio());
+                    res.setFechaFin(r.getFechaFin());
+                    res.setEstado(r.getFechaFin().isBefore(LocalDate.now()) ? "Finalizada" : "Activa");
+                    return res;
                 }).collect(Collectors.toList());
     }
 }

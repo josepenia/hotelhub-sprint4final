@@ -1,5 +1,6 @@
 package com.hotel.reservas.service;
 
+import com.hotel.reservas.exception.ResourceNotFoundException;
 import com.hotel.reservas.model.Politica;
 import com.hotel.reservas.model.Producto;
 import com.hotel.reservas.repository.PoliticaRepository;
@@ -22,14 +23,14 @@ public class PoliticaService {
 
     public Politica crear(Long productoId, Politica politica) {
         Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + productoId));
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + productoId));
         politica.setProducto(producto);
         return politicaRepository.save(politica);
     }
 
     public Politica editar(Long id, Politica politica) {
         Politica existing = politicaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Política no encontrada con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Política no encontrada con id: " + id));
         existing.setTitulo(politica.getTitulo());
         existing.setDescripcion(politica.getDescripcion());
         return politicaRepository.save(existing);
@@ -37,7 +38,7 @@ public class PoliticaService {
 
     public void eliminar(Long id) {
         if (!politicaRepository.existsById(id))
-            throw new RuntimeException("Política no encontrada con id: " + id);
+            throw new ResourceNotFoundException("Política no encontrada con id: " + id);
         politicaRepository.deleteById(id);
     }
 }

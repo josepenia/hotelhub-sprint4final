@@ -1,5 +1,7 @@
 package com.hotel.reservas.service;
 
+import com.hotel.reservas.exception.ConflictException;
+import com.hotel.reservas.exception.ResourceNotFoundException;
 import com.hotel.reservas.model.Caracteristica;
 import com.hotel.reservas.repository.CaracteristicaRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,24 +20,22 @@ public class CaracteristicaService {
     }
 
     public Caracteristica crear(Caracteristica c) {
-        if (caracteristicaRepository.existsByNombre(c.getNombre())) {
-            throw new RuntimeException("Ya existe una característica con ese nombre");
-        }
+        if (caracteristicaRepository.existsByNombre(c.getNombre()))
+            throw new ConflictException("Ya existe una característica con ese nombre");
         return caracteristicaRepository.save(c);
     }
 
     public Caracteristica editar(Long id, Caracteristica c) {
         Caracteristica existing = caracteristicaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Característica no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Característica no encontrada con id: " + id));
         existing.setNombre(c.getNombre());
         existing.setIcono(c.getIcono());
         return caracteristicaRepository.save(existing);
     }
 
     public void eliminar(Long id) {
-        if (!caracteristicaRepository.existsById(id)) {
-            throw new RuntimeException("Característica no encontrada");
-        }
+        if (!caracteristicaRepository.existsById(id))
+            throw new ResourceNotFoundException("Característica no encontrada con id: " + id);
         caracteristicaRepository.deleteById(id);
     }
 }
